@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stopwatch Record</title>
+</head>
+<body>
+
+<h1>Stopwatch Record</h1>
+
+<div>
+  <p id="recordTimeDisplay">Record: <span id="recordTime">--:--:--</span></p>
+</div>
+
+<script>
+  const recordTimeDisplay = document.getElementById('recordTime');
+
+  window.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const timeParam = urlParams.get('time');
+    if (timeParam) {
+      const elapsedTime = parseInt(timeParam, 10);
+      updateRecordDisplay(elapsedTime);
+    }
+  });
+
+  function updateRecordDisplay(recordTime) {
+    const milliseconds = recordTime % 1000;
+    const seconds = Math.floor((recordTime / 1000) % 60);
+    const minutes = Math.floor((recordTime / (1000 * 60)) % 60);
+    const hours = Math.floor((recordTime / (1000 * 60 * 60)) % 24);
+
+    const display = `${pad(hours)}:${pad(minutes)}:${pad(seconds)}.${pad(milliseconds, 3)}`;
+    recordTimeDisplay.textContent = display;
+  }
+
+  function pad(number, width = 2) {
+    return String(number).padStart(width, '0');
+  }
+</script>
+
+</body>
+</html>

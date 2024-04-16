@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stopwatch</title>
+  <style>
+    .container {
+      text-align: center;
+      margin-top: 100px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Stopwatch</h1>
+  <p id="display">00:00:00</p>
+  <button id="startButton">Start</button>
+  <button id="stopButton">Stop</button>
+</div>
+
+<script>
+  let elapsedTime = localStorage.getItem('elapsedTime') ? parseInt(localStorage.getItem('elapsedTime')) : 0;
+  let timerInterval;
+  let isRunning = false;
+
+  const startButton = document.getElementById('startButton');
+  const stopButton = document.getElementById('stopButton');
+
+  startButton.addEventListener('click', () => {
+    if (!isRunning) {
+      startStopwatch();
+      startButton.disabled = true;
+      stopButton.disabled = false;
+      isRunning = true;
+    }
+  });
+
+  stopButton.addEventListener('click', () => {
+    clearInterval(timerInterval);
+    startButton.disabled = false;
+    stopButton.disabled = true;
+    isRunning = false;
+    localStorage.setItem('elapsedTime', elapsedTime.toString());
+  });
+
+  function startStopwatch() {
+    const startTime = Date.now() - elapsedTime;
+    timerInterval = setInterval(() => {
+      elapsedTime = Date.now() - startTime;
+      updateDisplay();
+    }, 10);
+  }
+
+  function updateDisplay() {
+    const milliseconds = elapsedTime % 1000;
+    const seconds = Math.floor((elapsedTime / 1000) % 60);
+    const minutes = Math.floor((elapsedTime / (1000 * 60)) % 60);
+    const hours = Math.floor((elapsedTime / (1000 * 60 * 60)) % 24);
+
+    const display = `${pad(hours)}:${pad(minutes)}:${pad(seconds)}.${pad(milliseconds, 3)}`;
+    document.getElementById('display').textContent = display;
+  }
+
+  function pad(number, width = 2) {
+    return String(number).padStart(width, '0');
+  }
+
+  window.addEventListener('beforeunload', () => {
+    if (isRunning) {
+      localStorage.setItem('elapsedTime', elapsedTime.toString());
+    }
+  });
+
+  // ページ読み込み時にストップウォッチが実行中であれば再開する
+  window.addEventListener('load', () => {
+    if (isRunning) {
+      startStopwatch();
+    }
+  });
+</script>
+
+</body>
+</html>
